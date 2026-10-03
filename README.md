@@ -83,6 +83,10 @@ AI-Personal-Assistant/
 ├── Output/
 │   ├── output.txt
 │   ├── image_generated.jpeg
+│   └── question_answering.jpeg
+│   └── text_summarization.jpeg
+│   └── analyze_image.jpeg
+│   └── create_image.jpeg
 │
 ├── .gitignore
 └── README.md
