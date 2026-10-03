@@ -237,7 +237,7 @@ The `Output` folder contains screenshots demonstrating the different capabilitie
 
 The assistant accepts natural-language questions and generates AI-powered responses.
 
-![Question Answering](Output/question_answering.jpeg)
+![Question Answering](Output/question_answering.jpg)
 
 ---
 
@@ -245,7 +245,7 @@ The assistant accepts natural-language questions and generates AI-powered respon
 
 The assistant can process lengthy text and generate a concise summary.
 
-![Text Summarization](Output/text_summarization.jpeg)
+![Text Summarization](Output/text_summarization.jpg)
 
 ---
 
@@ -253,7 +253,7 @@ The assistant can process lengthy text and generate a concise summary.
 
 The assistant can analyze an image and respond to questions based on its visual content.
 
-![Image Analysis](Output/analyze_image.jpeg)
+![Image Analysis](Output/analyze_image.jpg)
 
 ---
 
@@ -261,9 +261,8 @@ The assistant can analyze an image and respond to questions based on its visual 
 
 The assistant can generate images from natural-language prompts using a generative AI model through Hugging Face.
 
-![Image Generation](Output/create_image.jpeg)
-
-> **Note:** Make sure these image filenames exactly match the files present inside the `Output` folder.
+![Image Generation](Output/create_image.jpg)
+![Generated Image](Output/image_generated.jpg)
 
 ---
 
