@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <title>AI Personal Assistant</title>
+</head>
+
+<body>
+
+    <h1 class="main-heading">AI Personal Assistant</h1>
+
+    <div class="container">
+
+        <!-- ==================== ASK ANYTHING ==================== -->
+
+        <section class="feature">
+            <h2>Ask Anything</h2>
+
+            <form id="askForm">
+
+                <input
+                    type="text"
+                    name="question"
+                    placeholder="Ask anything..."
+                    required
+                >
+
+                <button type="submit">Ask</button>
+
+            </form>
+
+            <p id="ans-loading" class="loading" style="display:none;">
+                Processing...
+            </p>
+
+            <div id="answer" class="output"></div>
+        </section>
+
+
+        <hr>
+
+
+        <!-- ==================== SUMMARIZE TEXT ==================== -->
+
+        <section class="feature">
+
+            <h2>Summarize Text</h2>
+
+            <form id="summarizeForm">
+
+                <textarea
+                    name="summary-text"
+                    placeholder="Paste your text here..."
+                    required
+                ></textarea>
+
+                <button type="submit">Summarize</button>
+
+            </form>
+
+            <p id="summary-loading" class="loading" style="display:none;">
+                Processing...
+            </p>
+
+            <div id="summary" class="output"></div>
+
+        </section>
+
+
+        <hr>
+
+
+        <!-- ==================== ANALYZE IMAGE ==================== -->
+
+        <section class="feature">
+
+            <h2>Analyze Image</h2>
+
+            <p class="description">
+                Upload an image or paste an image URL, then ask a question about it.
+            </p>
+
+            <form id="analyzeImageForm">
+
+                <!-- Image Upload -->
+                <label for="image-file">
+                    Upload Image
+                </label>
+
+                <input
+                    type="file"
+                    id="image-file"
+                    name="image"
+                    accept="image/*"
+                >
+
+                <p class="or-text">OR</p>
+
+                <!-- Image URL -->
+                <input
+                    type="url"
+                    id="image-url"
+                    name="image-url"
+                    placeholder="Paste image URL..."
+                >
+
+                <!-- Question -->
+                <textarea
+                    id="image-question"
+                    name="question"
+                    placeholder="What do you want to know about this image?"
+                    required
+                ></textarea>
+
+                <button type="submit">
+                    Analyze Image
+                </button>
+
+            </form>
+
+            <p id="image-loading" class="loading" style="display:none;">
+                Analyzing image...
+            </p>
+
+            <div id="image-answer" class="output"></div>
+
+        </section>
+
+
+        <hr>
+
+
+        <!-- ==================== CREATE IMAGE ==================== -->
+
+        <section class="feature">
+
+            <h2>Create Image</h2>
+
+            <p class="description">
+                Enter a prompt to generate an image. You can optionally provide
+                a reference image.
+            </p>
+
+            <form id="generateImageForm">
+
+                <!-- Prompt -->
+                <textarea
+                    id="image-prompt"
+                    name="prompt"
+                    placeholder="Describe the image you want to create..."
+                    required
+                ></textarea>
+
+
+                <!-- Reference Image Upload -->
+                <label for="reference-file">
+                    Reference Image (Optional)
+                </label>
+
+                <input
+                    type="file"
+                    id="reference-file"
+                    name="reference-image"
+                    accept="image/*"
+                >
+
+                <p class="or-text">OR</p>
+
+                <!-- Reference Image URL -->
+                <input
+                    type="url"
+                    id="reference-url"
+                    name="reference-url"
+                    placeholder="Paste reference image URL..."
+                >
+
+                <button type="submit">
+                    Generate Image
+                </button>
+
+            </form>
+
+            <p id="generate-loading" class="loading" style="display:none;">
+                Generating image...
+            </p>
+
+
+            <!-- Generated Image -->
+            <div
+                id="image-container"
+                class="generated-image-container"
+                style="display:none;"
+            >
+
+                <h3>Generated Image</h3>
+
+                <img
+                    id="generated-image"
+                    src=""
+                    alt="Generated Image"
+                >
+
+            </div>
+
+            <div id="generate-error" class="output error-output"></div>
+
+        </section>
+
+    </div>
+
+
+    <!-- ==================== JAVASCRIPT ==================== -->
+
+    <script>
+
+        // ============================================================
+        // ASK ANYTHING
+        // ============================================================
+
+        document.getElementById("askForm").onsubmit = async (e) => {
+
+            e.preventDefault();
+
+            let form = e.target;
+            let formData = new FormData(form);
+
+            let button = form.querySelector("button[type='submit']");
+            let loading = document.getElementById("ans-loading");
+            let answer = document.getElementById("answer");
+
+            // Disable button while processing
+            button.disabled = true;
+            button.innerText = "Processing...";
+
+            loading.style.display = "block";
+            answer.innerText = "";
+
+            try {
+
+                let res = await fetch("/ask", {
+                    method: "POST",
+                    body: formData
+                });
+
+                let data = await res.json();
+
+                if (!res.ok) {
+                    answer.innerText = "Error: " + data.error;
+                }
+                else {
+                    answer.innerText = data.response;
+                }
+
+            }
+            catch (error) {
+
+                answer.innerText =
+                    "Error: Unable to connect to the server.";
+
+            }
+            finally {
+
+                // Re-enable button after response
+                button.disabled = false;
+                button.innerText = "Ask";
+
+                loading.style.display = "none";
+            }
+        };
+
+
+        // ============================================================
+        // SUMMARIZE TEXT
+        // ============================================================
+
+        document.getElementById("summarizeForm").onsubmit = async (e) => {
+
+            e.preventDefault();
+
+            let form = e.target;
+            let formData = new FormData(form);
+
+            let button = form.querySelector("button[type='submit']");
+            let loading = document.getElementById("summary-loading");
+            let summary = document.getElementById("summary");
+
+            // Disable button while processing
+            button.disabled = true;
+            button.innerText = "Processing...";
+
+            loading.style.display = "block";
+            summary.innerText = "";
+
+            try {
+
+                let res = await fetch("/summarize", {
+                    method: "POST",
+                    body: formData
+                });
+
+                let data = await res.json();
+
+                if (!res.ok) {
+                    summary.innerText = "Error: " + data.error;
+                }
+                else {
+                    summary.innerText = data.response;
+                }
+
+            }
+            catch (error) {
+
+                summary.innerText =
+                    "Error: Unable to connect to the server.";
+
+            }
+            finally {
+
+                // Re-enable button after response
+                button.disabled = false;
+                button.innerText = "Summarize";
+
+                loading.style.display = "none";
+            }
+        };
+
+
+        // ============================================================
+        // ANALYZE IMAGE
+        // ============================================================
+
+        document.getElementById("analyzeImageForm").onsubmit = async (e) => {
+
+            e.preventDefault();
+
+            let form = e.target;
+
+            let imageFile = document.getElementById("image-file");
+            let imageUrl = document.getElementById("image-url");
+
+            let button = form.querySelector("button[type='submit']");
+            let loading = document.getElementById("image-loading");
+            let answer = document.getElementById("image-answer");
+
+
+            // --------------------------------------------------------
+            // Validate image source
+            // --------------------------------------------------------
+
+            if (
+                imageFile.files.length > 0 &&
+                imageUrl.value.trim() !== ""
+            ) {
+
+                answer.innerText =
+                    "Please provide either an image file OR an image URL, not both.";
+
+                return;
+            }
+
+
+            if (
+                imageFile.files.length === 0 &&
+                imageUrl.value.trim() === ""
+            ) {
+
+                answer.innerText =
+                    "Please upload an image or paste an image URL.";
+
+                return;
+            }
+
+
+            let formData = new FormData(form);
+
+
+            // Disable button while processing
+            button.disabled = true;
+            button.innerText = "Analyzing...";
+
+            loading.style.display = "block";
+            answer.innerText = "";
+
+
+            try {
+
+                let res = await fetch("/analyze-image", {
+                    method: "POST",
+                    body: formData
+                });
+
+                let data = await res.json();
+
+                if (!res.ok) {
+                    answer.innerText = "Error: " + data.error;
+                }
+                else {
+                    answer.innerText = data.response;
+                }
+
+            }
+            catch (error) {
+
+                answer.innerText =
+                    "Error: Unable to connect to the server.";
+
+            }
+            finally {
+
+                // Re-enable button after response
+                button.disabled = false;
+                button.innerText = "Analyze Image";
+
+                loading.style.display = "none";
+            }
+        };
+
+
+        // ============================================================
+        // CREATE IMAGE
+        // ============================================================
+
+        document.getElementById("generateImageForm").onsubmit = async (e) => {
+
+            e.preventDefault();
+
+            let form = e.target;
+
+            let referenceFile =
+                document.getElementById("reference-file");
+
+            let referenceUrl =
+                document.getElementById("reference-url");
+
+            let button =
+                form.querySelector("button[type='submit']");
+
+            let loading =
+                document.getElementById("generate-loading");
+
+            let imageContainer =
+                document.getElementById("image-container");
+
+            let generatedImage =
+                document.getElementById("generated-image");
+
+            let errorBox =
+                document.getElementById("generate-error");
+
+
+            // --------------------------------------------------------
+            // Validate reference image source
+            // --------------------------------------------------------
+
+            if (
+                referenceFile.files.length > 0 &&
+                referenceUrl.value.trim() !== ""
+            ) {
+
+                errorBox.innerText =
+                    "Please provide either a reference image file OR a reference image URL, not both.";
+
+                return;
+            }
+
+
+            let formData = new FormData(form);
+
+
+            // Disable button while processing
+            button.disabled = true;
+            button.innerText = "Generating...";
+
+            loading.style.display = "block";
+
+            imageContainer.style.display = "none";
+            errorBox.innerText = "";
+
+
+            try {
+
+                let res = await fetch("/generate-image", {
+                    method: "POST",
+                    body: formData
+                });
+
+                let data = await res.json();
+
+                if (!res.ok) {
+
+                    errorBox.innerText =
+                        "Error: " + data.error;
+
+                }
+                else {
+
+                    generatedImage.src = data.image;
+
+                    imageContainer.style.display = "block";
+                }
+
+            }
+            catch (error) {
+
+                errorBox.innerText =
+                    "Error: Unable to connect to the server.";
+
+            }
+            finally {
+
+                // Re-enable button after response
+                button.disabled = false;
+                button.innerText = "Generate Image";
+
+                loading.style.display = "none";
+            }
+        };
+
+    </script>
+
+</body>
+</html>
