@@ -81,10 +81,8 @@ AI-Personal-Assistant/
 │   └── index.html
 │
 ├── Output/
-│   ├── question_answering.png
-│   ├── text_summarization.png
-│   ├── image_analysis.png
-│   └── image_generation.png
+│   ├── output.txt
+│   ├── image_generated.jpeg
 │
 ├── .gitignore
 └── README.md
